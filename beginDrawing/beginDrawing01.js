@@ -20,7 +20,7 @@ var VSHADER_SOURCE =
   `attribute vec4 a_Position;
    void main() {
      gl_Position = a_Position;	//set on-screen position
-     gl_PointSize = 7.0;				// point-size in pixels (for point primitive)
+     gl_PointSize = 10.0;				// point-size in pixels (for point primitive)
    }`
 // !!Wait-Wait-Wait!!  TEXTBOOK uses single-line strings for shader programs,
 //	then adds 'newline' and connects them together like this:
@@ -39,7 +39,7 @@ var VSHADER_SOURCE =
 //  Each instance computes all the on-screen attributes for just one PIXEL
 var FSHADER_SOURCE =
  `void main() {
-    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // easy! every pixel has this color
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0); // easy! every pixel has this color
   }`
 
 function main() {
@@ -70,7 +70,7 @@ function main() {
   }
 
   // Specify the color for clearing <canvas>: (Northwestern purple)
-  gl.clearColor(0/255, 0/255, 0/255 , 1.0);	// R,G,B,A (A==opacity)
+  gl.clearColor(78/255, 42/255, 132/255 , 1.0);	// R,G,B,A (A==opacity)
   // NOTE: 0.0 <= RGBA <= 1.0 
   // others to try:
   // gl.clearColor(0.0, 0.0 ,0.0, 1.0);
@@ -104,19 +104,15 @@ function initVertexBuffers(gl) {
 //==============================================================================
 // first, create a JavaScript typed array with all our vertex attribute values:
   var vertices = new Float32Array([
-    // CAREFUL! I made these into 4D points/ vertices: x,y,z,w.
-    // new point!  (? What happens if I make w=0 instead of 1.0?)
-
-    
-    // Scaled down by 0.25 then shifted everything over by -0.25
-    // for the shape to be more centered. 
-    0.0,  0.0, 0.0, 1.0,	
-    0.25, 0.0, 0.0, 1.0,   
-    0.0, 0.25, 0.0, 1.0,	
-    0.0, 0.0, 0.25, 1.0,
-      
+     0.0,  0.5, 0.0, 1.0,	// CAREFUL! I made these into 4D points/ vertices: x,y,z,w.
+    -0.2,  0.0, 0.0, 1.0,	// new point!  (? What happens if I make w=0 instead of 1.0?)
+    -0.5, -0.5, 0.0, 1.0, // new point! (note we need a trailing commas here)  
+     0.0, -0.2, 0.0, 1.0, 	
+     0.5, -0.5, 0.0, 1.0,	
+     0.2,  0.0, 0.0, 1.0, 
+     0.7,  0.4, 0.0, 1.0,
   ]);
-  var n = 4; // The number of vertices
+  var n = 7; // The number of vertices
 
   // Then in the GPU, create a vertex buffer object (VBO) to hold vertex data:
   var VBOloc = gl.createBuffer();	// get it's 'handle'
