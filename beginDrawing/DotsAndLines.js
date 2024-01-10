@@ -110,13 +110,22 @@ function initVertexBuffers(gl) {
     
     // Scaled down by 0.25 then shifted everything over by -0.25
     // for the shape to be more centered. 
+    // Point on z-axis was also rotated by -0.25/2 to show perspective.
     0.0,  0.0, 0.0, 1.0,	
     0.25, 0.0, 0.0, 1.0,   
-    0.0, 0.25, 0.0, 1.0,	
-    0.0, 0.0, 0.25, 1.0,
+    0.0, 0.25, 0.0, 1.0,
+    0.0,  0.0, 0.0, 1.0,	
+    0.0, 0.25, 0.0, 1.0,
+    -0.25/2, -0.25/2, 0.25, 1.0,
+    0.0,  0.0, 0.0, 1.0,
+    -0.25/2, -0.25/2, 0.25, 1.0,
+    0.25, 0.0, 0.0, 1.0,
       
   ]);
-  var n = 4; // The number of vertices
+  // Although there are more vertices than the original 3D object, the
+  // additional vertices are used to show perspective. The correct number of 
+  // vertices (4) appear on screen. 
+  var n = 9; // The number of vertices
 
   // Then in the GPU, create a vertex buffer object (VBO) to hold vertex data:
   var VBOloc = gl.createBuffer();	// get it's 'handle'
