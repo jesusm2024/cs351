@@ -112,7 +112,10 @@ function main() {
     // drawAll(gl, n, currentAngle, modelMatrix, u_ModelMatrix);   // Draw shapes
 	drawResize(gl, n, currentAngle, modelMatrix, u_ModelMatrix);
     // report current angle on console
-    //console.log('currentAngle=',currentAngle);
+    // console.log('currentAngle=',currentAngle);
+	// console.log("eye: " + eye[0] + " " + eye[1] + " " + eye[2]);
+	// console.log("theta: " + theta);
+	// console.log("deltaTilt: " + deltaTilt);
     requestAnimationFrame(tick, canvas);   
     									// Request that the browser re-draw the webpage
   };
@@ -121,19 +124,20 @@ function main() {
 }
 
 // Global camera control variables
-var eye = [2, 5, 3]; // Camera position
-var theta = 10; // Camera compass angle in radians
-var deltaTilt = 0; // Camera tilt amount
+var eye = [6.5, -0.2, 3]; // Camera position
+var theta = 9.5; // Camera compass angle in radians
+var deltaTilt = -0.5; // Camera tilt amount
 var moveSpeed = 0.2; // Movement speed
 var strafeSpeed = 0.2; // Strafing speed
 
 
+var forward = new Float32Array(3); 
+var right = new Float32Array(3);
+var up = new Float32Array([0, 0, 1]); // Assuming Y-up coordinate system
+
+
 function keydown(ev) {
     
-	var forward = new Float32Array(3);
-    var right = new Float32Array(3);
-    var up = new Float32Array([0, 0, 1]); // Assuming Y-up coordinate system
-
 	// Calculate forward direction (aim direction)
     forward[0] = Math.cos(theta);
     forward[1] = Math.sin(theta);
@@ -149,7 +153,6 @@ function keydown(ev) {
 
 	// Normalize right direction
     right = normalize(right);
-
 
     switch (ev.keyCode) {
 		// WASD control
@@ -176,6 +179,16 @@ function keydown(ev) {
             eye[1] += right[1] * strafeSpeed;
             eye[2] += right[2] * strafeSpeed;
             break;
+		case 38: // Up arrow key -> move toward aim direction
+            eye[0] += forward[0] * moveSpeed;
+            eye[1] += forward[1] * moveSpeed;
+            eye[2] += forward[2] * moveSpeed;
+            break
+		case 40: // Down arrow key -> move away from aim direction
+            eye[0] -= forward[0] * moveSpeed;
+            eye[1] -= forward[1] * moveSpeed;
+            eye[2] -= forward[2] * moveSpeed;
+            break;
     }
 
 }
@@ -190,25 +203,6 @@ function normalize(vec) {
     }
     return vec;
 }
-
-
-// function keydown(ev) {
-//     switch (ev.keyCode) {
-//         case 87: // W key -> tilt up
-//             deltaTilt += 0.1;
-//             break;
-//         case 83: // S key -> tilt down
-//             deltaTilt -= 0.1;
-//             break;
-//         case 65: // A key -> turn left
-//             theta += 0.1;
-//             break;
-//         case 68: // D key -> turn right
-//             theta -= 0.1;
-//             break;
-//         // Add other cases for additional controls
-//     }
-// }
 
 function initVertexBuffer(gl) {
 //==============================================================================
@@ -708,7 +702,6 @@ function updateAimPoint() {
     return aim;
 }
 
-///////
 
 function drawScene(gl, n, currentAngle, modelMatrix, u_ModelMatrix, vpAspect) {
 //==============================================================================
@@ -752,6 +745,7 @@ function drawScene(gl, n, currentAngle, modelMatrix, u_ModelMatrix, vpAspect) {
     gl.drawArrays(gl.TRIANGLE_STRIP,				// use this drawing primitive, and
     							cylStart/floatsPerVertex, // start at this vertex number, and
     							cylVerts.length/floatsPerVertex);	// draw this many vertices.
+	
   modelMatrix = popMatrix();  // RESTORE 'world' drawing coords.
   //===========================================================
   //  
