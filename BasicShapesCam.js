@@ -120,10 +120,39 @@ function main() {
     
 }
 
+// Global camera control variables
+var eye = [2, 5, 3]; // Camera position
+var theta = 10; // Camera compass angle in radians
+var deltaTilt = 0; // Camera tilt amount
+var moveSpeed = 0.2; // Movement speed
+var strafeSpeed = 0.2; // Strafing speed
 
 
 function keydown(ev) {
+    
+	var forward = new Float32Array(3);
+    var right = new Float32Array(3);
+    var up = new Float32Array([0, 0, 1]); // Assuming Y-up coordinate system
+
+	// Calculate forward direction (aim direction)
+    forward[0] = Math.cos(theta);
+    forward[1] = Math.sin(theta);
+    forward[2] = deltaTilt;
+
+    // Normalize forward direction
+    forward = normalize(forward);
+
+	// Calculate right direction (strafe direction)
+    right[0] = forward[1] * up[2] - forward[2] * up[1];
+    right[1] = forward[2] * up[0] - forward[0] * up[2];
+    right[2] = forward[0] * up[1] - forward[1] * up[0];
+
+	// Normalize right direction
+    right = normalize(right);
+
+
     switch (ev.keyCode) {
+		// WASD control
         case 87: // W key -> tilt up
             deltaTilt += 0.1;
             break;
@@ -136,9 +165,50 @@ function keydown(ev) {
         case 68: // D key -> turn right
             theta -= 0.1;
             break;
-        // Add other cases for additional controls
+        // Arrow keys control
+		case 37: // Left arrow key -> strafe left
+            eye[0] -= right[0] * strafeSpeed;
+            eye[1] -= right[1] * strafeSpeed;
+            eye[2] -= right[2] * strafeSpeed;
+            break;
+        case 39: // Right arrow key -> strafe right
+            eye[0] += right[0] * strafeSpeed;
+            eye[1] += right[1] * strafeSpeed;
+            eye[2] += right[2] * strafeSpeed;
+            break;
     }
+
 }
+
+
+function normalize(vec) {
+    var len = Math.sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
+    if (len > 0) {
+        vec[0] /= len;
+        vec[1] /= len;
+        vec[2] /= len;
+    }
+    return vec;
+}
+
+
+// function keydown(ev) {
+//     switch (ev.keyCode) {
+//         case 87: // W key -> tilt up
+//             deltaTilt += 0.1;
+//             break;
+//         case 83: // S key -> tilt down
+//             deltaTilt -= 0.1;
+//             break;
+//         case 65: // A key -> turn left
+//             theta += 0.1;
+//             break;
+//         case 68: // D key -> turn right
+//             theta -= 0.1;
+//             break;
+//         // Add other cases for additional controls
+//     }
+// }
 
 function initVertexBuffer(gl) {
 //==============================================================================
@@ -628,10 +698,6 @@ function drawAll(gl, n, currentAngle, modelMatrix, u_ModelMatrix) {
 	drawScene(gl, n, currentAngle, modelMatrix, u_ModelMatrix, vpAspect);
 }
 
-// Aim Camera 
-var eye = [2, 5, 3]; // Example camera position
-var theta = 10; // Camera compass angle
-var deltaTilt = 0; // Camera tilt amount
 
 function updateAimPoint() {
     var aim = [
@@ -641,6 +707,8 @@ function updateAimPoint() {
     ];
     return aim;
 }
+
+///////
 
 function drawScene(gl, n, currentAngle, modelMatrix, u_ModelMatrix, vpAspect) {
 //==============================================================================
@@ -662,7 +730,7 @@ function drawScene(gl, n, currentAngle, modelMatrix, u_ModelMatrix, vpAspect) {
 //                       -1, -2, -0.5,	// look-at point 
 //                       0, 0, 1);	// View UP vector.
 
-	modelMatrix.lookAt( 2, 5, 3,	// center of projection
+	modelMatrix.lookAt( eye[0], eye[1], eye[2],	// center of projection
 	aim[0], aim[1], aim[2],	// look-at point 
 	0, 0, 1);	// View UP vector.
 
